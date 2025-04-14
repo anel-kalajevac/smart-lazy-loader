@@ -24,6 +24,12 @@
   "main": "dist/smart-lazy-loader.cjs.js",
   "module": "dist/smart-lazy-loader.es.js",
   "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rm -rf dist",
