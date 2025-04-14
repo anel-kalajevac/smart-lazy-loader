@@ -2,27 +2,30 @@ type LazyLoadOptions =
   | {
       on: 'visible';
       target: HTMLElement;
-      delay: never;
-      threshold: number;
+      delay?: never;
+      rootMargin?: string;
+      threshold?: number;
     }
   | {
       on: 'delay';
       target: HTMLElement;
       delay: number;
-      threshold: never;
+      rootMargin?: never;
+      threshold?: never;
     }
   | {
-      on: 'idle' | 'interaction';
+      on: 'idle' | 'click' | 'mousemove';
       target: HTMLElement;
-      delay: never;
-      threshold: never;
+      delay?: never;
+      rootMargin?: never;
+      threshold?: never;
     };
 
 export function lazyLoad<T>(
   importer: () => Promise<T>,
   options: LazyLoadOptions
 ): Promise<T> | void {
-  const { on = 'visible', target, delay = 2000 } = options;
+  const { on = 'visible', target, delay, rootMargin = '0', threshold = 0 } = options;
 
   const load = () => importer();
 
@@ -31,7 +34,7 @@ export function lazyLoad<T>(
       if ('requestIdleCallback' in window) {
         requestIdleCallback(() => load());
       } else {
-        setTimeout(() => load(), delay);
+        setTimeout(() => load(), 2000);
       }
       break;
 
@@ -39,26 +42,41 @@ export function lazyLoad<T>(
       setTimeout(() => load(), delay);
       break;
 
-    case 'interaction':
-      const listener = () => {
+    case 'click':
+      const onClick = () => {
         load();
-        document.removeEventListener('click', listener);
-        document.removeEventListener('mousemove', listener);
+        target.removeEventListener('click', onClick);
       };
-      document.addEventListener('click', listener);
-      document.addEventListener('mousemove', listener);
+      target.addEventListener('click', onClick);
+      break;
+
+    case 'mousemove':
+      const onMousemove = () => {
+        load();
+        target.removeEventListener('mousemove', onMousemove);
+      };
+      target.addEventListener('mousemove', onMousemove);
       break;
 
     case 'visible':
-    default:
-      if (!target) throw new Error("Target element is required for 'visible' strategy");
-
-      const observer = new IntersectionObserver((entries, obs) => {
-        if (entries?.[0]?.isIntersecting) {
-          load();
-          obs.disconnect();
+      const observer = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              load();
+              obs.disconnect();
+            }
+          });
+        },
+        {
+          rootMargin,
+          threshold,
         }
-      });
+      );
       observer.observe(target);
+      break;
+
+    default:
+      throw new Error('Unsupported event type: ' + on);
   }
 }
