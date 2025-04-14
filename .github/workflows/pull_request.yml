@@ -1,0 +1,35 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/jod'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint code
+        run: yarn lint
+
+      - name: Type check
+        run: yarn type-check
+
+      - name: Run tests
+        run: yarn test
+
+      - name: Run coverage
+        run: yarn coverage
+
+      - name: Build project
+        run: yarn build

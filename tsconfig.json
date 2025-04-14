@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // Output
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "dist/types",
+    "outDir": "dist",
+
+    // Modern module support
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+
+    // Compatibility
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+
+    // Dev safety
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
