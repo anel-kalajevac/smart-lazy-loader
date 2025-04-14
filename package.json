@@ -19,6 +19,7 @@
     "dev": "vite",
     "format": "prettier --write .",
     "lint": "eslint .",
+    "prepare": "husky",
     "preview": "vite preview"
   },
   "types": "dist/types/index.d.ts",
@@ -40,5 +41,14 @@
     "image",
     "lazy",
     "performance"
-  ]
+  ],
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,jsx,json,css,md}": [
+      "prettier --write"
+    ]
+  }
 }
