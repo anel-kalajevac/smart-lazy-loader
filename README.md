@@ -3,7 +3,7 @@
 > A simple and flexible lazy load utility that works in various event-driven scenarios, such as visibility, idle, click, and mousemove. Optimized for performance and can be easily integrated into any JavaScript or TypeScript project.
 
 ![npm version](https://img.shields.io/npm/v/smart-lazy-loader)
-![license](https://img.shields.io/npm/l/smart-lazy-loader)
+![license](https://img.shields.io/github/license/anel-kalajevac/smart-lazy-loader)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/smart-lazy-loader)
 ![types](https://img.shields.io/npm/types/smart-lazy-loader)
 ![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
