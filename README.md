@@ -6,7 +6,6 @@
 ![license](https://img.shields.io/npm/l/smart-lazy-loader)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/smart-lazy-loader)
 ![types](https://img.shields.io/npm/types/smart-lazy-loader)
-![tests](https://img.shields.io/github/actions/workflow/status/yourusername/your-lazy-load-library/test.yml?label=tests)
 ![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 ![code style](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)
 ![semantic release](https://img.shields.io/badge/release-semantic--release-blue)
