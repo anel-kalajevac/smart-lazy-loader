@@ -29,7 +29,8 @@ describe('lazyLoad', () => {
   it('loads on idle (requestIdleCallback)', () => {
     const importer = vi.fn();
     const target = document.createElement('div');
-    (globalThis as any).requestIdleCallback = (cb: Function) => cb();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    globalThis.requestIdleCallback = (cb: Function) => cb();
 
     lazyLoad(importer, {
       on: 'idle',
@@ -42,7 +43,7 @@ describe('lazyLoad', () => {
   it('should fallback to setTimeout if requestIdleCallback is not available', async () => {
     const importer = vi.fn(() => Promise.resolve('module'));
     const original = window.requestIdleCallback;
-    // @ts-ignore
+    // @ts-expect-error - simulating unavailable requestIdleCallback
     delete window.requestIdleCallback;
 
     lazyLoad(importer, {
@@ -98,12 +99,15 @@ describe('lazyLoad', () => {
     const observe = vi.fn();
     const disconnect = vi.fn();
 
-    const mockObserver = vi.fn((cb: any) => {
-      cb([{ isIntersecting: true }], { disconnect });
-      return { observe, disconnect };
-    });
+    const mockObserver = vi.fn(
+      (cb: (a: { isIntersecting: boolean }[], b: { disconnect: typeof vi.fn }) => void) => {
+        cb([{ isIntersecting: true }], { disconnect });
+        return { observe, disconnect };
+      }
+    );
 
-    globalThis.IntersectionObserver = mockObserver as any;
+    // @ts-expect-error - mocking IntersectionObserver
+    globalThis.IntersectionObserver = mockObserver;
 
     lazyLoad(importer, {
       on: 'visible',
