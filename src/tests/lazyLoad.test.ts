@@ -134,4 +134,51 @@ describe('lazyLoad', () => {
       });
     }).toThrow('Unsupported event type: unsupported');
   });
+
+  it('manually triggers the load via controller.trigger()', async () => {
+    const importer = vi.fn(() => Promise.resolve('module'));
+    const target = document.createElement('div');
+
+    const controller = lazyLoad(importer, {
+      on: 'delay',
+      delay: 1000,
+      target,
+    });
+
+    expect(importer).not.toHaveBeenCalled();
+    await controller.trigger();
+    expect(importer).toHaveBeenCalledTimes(1);
+
+    await controller.trigger();
+    expect(importer).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancels the load before it happens', () => {
+    const importer = vi.fn();
+    const target = document.createElement('div');
+
+    const controller = lazyLoad(importer, {
+      on: 'delay',
+      delay: 1000,
+      target,
+    });
+
+    controller.cancel();
+    vi.advanceTimersByTime(1000);
+    expect(importer).not.toHaveBeenCalled();
+  });
+
+  it('reflects loading status in hasLoaded', async () => {
+    const importer = vi.fn(() => Promise.resolve('module'));
+    const target = document.createElement('div');
+
+    const controller = lazyLoad(importer, {
+      on: 'click',
+      target,
+    });
+
+    expect(controller.hasLoaded).toBe(false);
+    target.dispatchEvent(new MouseEvent('click'));
+    expect(controller.hasLoaded).toBe(true);
+  });
 });
