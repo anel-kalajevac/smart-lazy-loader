@@ -20,6 +20,7 @@
   - `delay` (with customizable delay)
   - `click` (triggered on user click)
   - `mousemove` (triggered on user mouse movement)
+- 🛠️ **Full control**: Exposes a controller with `trigger`, `cancel`, and `hasLoaded` for more flexibility.
 - 🎯 Tiny, tree-shakable, no dependencies
 - 💡 Written in TypeScript with full type support
 
@@ -48,12 +49,21 @@ const MyComponent = () => import('./MyComponent');
 
 const target = document.getElementById('component-target') as HTMLElement;
 
-lazyLoad(MyComponent, {
+const controller = lazyLoad(MyComponent, {
   on: 'visible',
   target,
   rootMargin: '100px', // trigger 100px before component is visible
   threshold: 0.5, // trigger when 50% of the component is visible
 });
+
+// Trigger manually
+controller.trigger();
+
+// Check if the component has already loaded
+console.log(controller.hasLoaded); // false (initially)
+
+// Cancel lazy loading (if it hasn't already triggered)
+controller.cancel();
 ```
 
 ### Example: Lazy loading after a delay
