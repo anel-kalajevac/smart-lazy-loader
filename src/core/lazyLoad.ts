@@ -27,20 +27,37 @@ type LazyLoadController<T> = {
   hasLoaded: boolean;
 };
 
+type LazyImporter<T> = () => Promise<T>;
+type LazyLoadInput<T> = LazyImporter<T> | LazyImporter<T>[];
+
 export function lazyLoad<T>(
-  importer: () => Promise<T>,
+  importer: LazyImporter<T>,
   options: LazyLoadOptions
-): LazyLoadController<T> {
+): LazyLoadController<T>;
+
+export function lazyLoad<T>(
+  importer: LazyImporter<T>[],
+  options: LazyLoadOptions
+): LazyLoadController<T[]>;
+
+export function lazyLoad<T>(
+  importer: LazyLoadInput<T>,
+  options: LazyLoadOptions
+): LazyLoadController<T | T[]> {
   const { on = 'visible', target, delay, rootMargin = '0', threshold = 0 } = options;
   let hasLoaded = false;
-  let result: Promise<T> | null = null;
+  let result: Promise<T | T[]> | null = null;
   let cleanup: (() => void) | undefined;
 
   const load = () => {
     if (hasLoaded && result) return result;
     hasLoaded = true;
     cleanup?.();
-    result = importer();
+    if (Array.isArray(importer)) {
+      result = Promise.all(importer.map((fn) => fn()));
+    } else {
+      result = importer();
+    }
     return result;
   };
 
