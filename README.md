@@ -20,6 +20,7 @@
   - `delay` (with customizable delay)
   - `click` (triggered on user click)
   - `mousemove` (triggered on user mouse movement)
+- 📦 **Batch support**: Load multiple modules in parallel with a single trigger.
 - 🛠️ **Full control**: Exposes a controller with `trigger`, `cancel`, and `hasLoaded` for more flexibility.
 - 🎯 Tiny, tree-shakable, no dependencies
 - 💡 Written in TypeScript with full type support
@@ -119,6 +120,22 @@ const target = document.getElementById('component-target') as HTMLElement;
 
 lazyLoad(MyComponent, {
   on: 'idle',
+  target,
+});
+```
+
+### Example: Load multiple modules (batch)
+
+```ts
+import { lazyLoad } from 'smart-lazy-loader';
+
+const loadA = () => import('./ComponentA');
+const loadB = () => import('./ComponentB');
+
+const target = document.getElementById('batch-target') as HTMLElement;
+
+lazyLoad([loadA, loadB], {
+  on: 'click',
   target,
 });
 ```

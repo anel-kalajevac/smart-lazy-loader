@@ -181,4 +181,59 @@ describe('lazyLoad', () => {
     target.dispatchEvent(new MouseEvent('click'));
     expect(controller.hasLoaded).toBe(true);
   });
+
+  it('loads multiple modules via batch import', async () => {
+    const importerA = vi.fn(() => Promise.resolve('A'));
+    const importerB = vi.fn(() => Promise.resolve('B'));
+    const target = document.createElement('div');
+
+    const controller = lazyLoad([importerA, importerB], {
+      on: 'click',
+      target,
+    });
+
+    const event = new MouseEvent('click');
+    target.dispatchEvent(event);
+
+    const result = await controller.trigger();
+
+    expect(importerA).toHaveBeenCalledTimes(1);
+    expect(importerB).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(['A', 'B']);
+  });
+
+  it('cancels batch import before any modules are loaded', () => {
+    const importerA = vi.fn(() => Promise.resolve('A'));
+    const importerB = vi.fn(() => Promise.resolve('B'));
+    const target = document.createElement('div');
+
+    const controller = lazyLoad([importerA, importerB], {
+      on: 'delay',
+      delay: 1000,
+      target,
+    });
+
+    controller.cancel();
+    vi.advanceTimersByTime(1000);
+
+    expect(importerA).not.toHaveBeenCalled();
+    expect(importerB).not.toHaveBeenCalled();
+  });
+
+  it('batch importer only loads once even after multiple trigger calls', async () => {
+    const importerA = vi.fn(() => Promise.resolve('A'));
+    const importerB = vi.fn(() => Promise.resolve('B'));
+    const target = document.createElement('div');
+
+    const controller = lazyLoad([importerA, importerB], {
+      on: 'click',
+      target,
+    });
+
+    await controller.trigger();
+    await controller.trigger();
+
+    expect(importerA).toHaveBeenCalledTimes(1);
+    expect(importerB).toHaveBeenCalledTimes(1);
+  });
 });
