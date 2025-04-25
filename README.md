@@ -77,7 +77,6 @@ const target = document.getElementById('component-target') as HTMLElement;
 
 lazyLoad(MyComponent, {
   on: 'delay',
-  target,
   delay: 1000, // wait 1 second before loading
 });
 ```
@@ -120,7 +119,6 @@ const target = document.getElementById('component-target') as HTMLElement;
 
 lazyLoad(MyComponent, {
   on: 'idle',
-  target,
 });
 ```
 

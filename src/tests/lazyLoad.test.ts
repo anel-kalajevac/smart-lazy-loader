@@ -13,12 +13,10 @@ describe('lazyLoad', () => {
 
   it('loads after delay', () => {
     const importer = vi.fn();
-    const target = document.createElement('div');
 
     lazyLoad(importer, {
       on: 'delay',
       delay: 1000,
-      target,
     });
 
     expect(importer).not.toHaveBeenCalled();
@@ -28,13 +26,11 @@ describe('lazyLoad', () => {
 
   it('loads on idle (requestIdleCallback)', () => {
     const importer = vi.fn();
-    const target = document.createElement('div');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     globalThis.requestIdleCallback = (cb: Function) => cb();
 
     lazyLoad(importer, {
       on: 'idle',
-      target,
     });
 
     expect(importer).toHaveBeenCalled();
@@ -48,7 +44,6 @@ describe('lazyLoad', () => {
 
     lazyLoad(importer, {
       on: 'idle',
-      target: document.createElement('div'),
     });
 
     // Fast-forward timeouts
@@ -113,7 +108,6 @@ describe('lazyLoad', () => {
       on: 'visible',
       target,
       rootMargin: '0px',
-      delay: undefined as never,
     });
 
     expect(importer).toHaveBeenCalled();
@@ -125,14 +119,12 @@ describe('lazyLoad', () => {
     const target = document.createElement('div');
 
     expect(() => {
+      // @ts-expect-error - simulating unsupported event
       lazyLoad(importer, {
-        // @ts-expect-error - simulating unsupported event
         on: 'unsupported',
         target,
-        delay: undefined,
-        rootMargin: undefined,
       });
-    }).toThrow('Unsupported event type: unsupported');
+    }).toThrow('Unsupported event type!');
   });
 
   it('manually triggers the load via controller.trigger()', async () => {
@@ -142,7 +134,6 @@ describe('lazyLoad', () => {
     const controller = lazyLoad(importer, {
       on: 'delay',
       delay: 1000,
-      target,
     });
 
     expect(importer).not.toHaveBeenCalled();
@@ -160,7 +151,6 @@ describe('lazyLoad', () => {
     const controller = lazyLoad(importer, {
       on: 'delay',
       delay: 1000,
-      target,
     });
 
     controller.cancel();
@@ -210,7 +200,6 @@ describe('lazyLoad', () => {
     const controller = lazyLoad([importerA, importerB], {
       on: 'delay',
       delay: 1000,
-      target,
     });
 
     controller.cancel();
