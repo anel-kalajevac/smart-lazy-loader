@@ -1,34 +1,9 @@
-type LazyLoadOptions =
-  | {
-      on: 'visible';
-      target: HTMLElement;
-      delay?: never;
-      rootMargin?: string;
-      threshold?: number;
-    }
-  | {
-      on: 'delay';
-      target: HTMLElement;
-      delay: number;
-      rootMargin?: never;
-      threshold?: never;
-    }
-  | {
-      on: 'idle' | 'click' | 'mousemove';
-      target: HTMLElement;
-      delay?: never;
-      rootMargin?: never;
-      threshold?: never;
-    };
-
-type LazyLoadController<T> = {
-  trigger: () => Promise<T>;
-  cancel: () => void;
-  hasLoaded: boolean;
-};
-
-type LazyImporter<T> = () => Promise<T>;
-type LazyLoadInput<T> = LazyImporter<T> | LazyImporter<T>[];
+import { createClickTrigger } from './triggers/click';
+import { createDelayTrigger } from './triggers/delay';
+import { createIdleTrigger } from './triggers/idle';
+import { createMousemoveTrigger } from './triggers/mousemove';
+import { createVisibleTrigger } from './triggers/visible';
+import { LazyImporter, LazyLoadController, LazyLoadOptions } from './types';
 
 export function lazyLoad<T>(
   importer: LazyImporter<T>,
@@ -41,10 +16,9 @@ export function lazyLoad<T>(
 ): LazyLoadController<T[]>;
 
 export function lazyLoad<T>(
-  importer: LazyLoadInput<T>,
+  importer: LazyImporter<T> | LazyImporter<T>[],
   options: LazyLoadOptions
 ): LazyLoadController<T | T[]> {
-  const { on = 'visible', target, delay, rootMargin = '0', threshold = 0 } = options;
   let hasLoaded = false;
   let result: Promise<T | T[]> | null = null;
   let cleanup: (() => void) | undefined;
@@ -61,55 +35,31 @@ export function lazyLoad<T>(
     return result;
   };
 
-  switch (on) {
+  switch (options.on) {
     case 'idle':
-      if ('requestIdleCallback' in window) {
-        const id = requestIdleCallback(() => load());
-        cleanup = () => cancelIdleCallback(id);
-      } else {
-        const fallbackId = setTimeout(() => load(), 2000);
-        cleanup = () => clearTimeout(fallbackId);
-      }
+      cleanup = createIdleTrigger(load);
       break;
 
     case 'delay':
-      const timeoutId = setTimeout(() => load(), delay);
-      cleanup = () => clearTimeout(timeoutId);
+      cleanup = createDelayTrigger(options.delay, load);
       break;
 
     case 'click':
-      const onClick = () => load();
-      target.addEventListener('click', onClick, { once: true });
-      cleanup = () => target.removeEventListener('click', onClick);
+      cleanup = createClickTrigger(options.target, load);
       break;
 
-    case 'mousemove':
-      const onMousemove = () => load();
-      target.addEventListener('mousemove', onMousemove, { once: true });
-      cleanup = () => target.removeEventListener('mousemove', onMousemove);
+    case 'mousemove': {
+      cleanup = createMousemoveTrigger(options.target, load);
       break;
+    }
 
-    case 'visible':
-      const observer = new IntersectionObserver(
-        (entries, obs) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              load();
-              obs.disconnect();
-            }
-          });
-        },
-        {
-          rootMargin,
-          threshold,
-        }
-      );
-      observer.observe(target);
-      cleanup = () => observer.disconnect();
+    case 'visible': {
+      cleanup = createVisibleTrigger(options.target, load);
       break;
+    }
 
     default:
-      throw new Error('Unsupported event type: ' + on);
+      throw new Error('Unsupported event type!');
   }
 
   return {
