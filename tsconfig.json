@@ -3,8 +3,6 @@
     // Output
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationDir": "dist/types",
-    "outDir": "dist",
 
     // Modern module support
     "target": "ESNext",
