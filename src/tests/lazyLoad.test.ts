@@ -129,7 +129,6 @@ describe('lazyLoad', () => {
 
   it('manually triggers the load via controller.trigger()', async () => {
     const importer = vi.fn(() => Promise.resolve('module'));
-    const target = document.createElement('div');
 
     const controller = lazyLoad(importer, {
       on: 'delay',
@@ -146,7 +145,6 @@ describe('lazyLoad', () => {
 
   it('cancels the load before it happens', () => {
     const importer = vi.fn();
-    const target = document.createElement('div');
 
     const controller = lazyLoad(importer, {
       on: 'delay',
@@ -195,7 +193,6 @@ describe('lazyLoad', () => {
   it('cancels batch import before any modules are loaded', () => {
     const importerA = vi.fn(() => Promise.resolve('A'));
     const importerB = vi.fn(() => Promise.resolve('B'));
-    const target = document.createElement('div');
 
     const controller = lazyLoad([importerA, importerB], {
       on: 'delay',

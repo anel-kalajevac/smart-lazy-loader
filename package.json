@@ -16,14 +16,14 @@
   "author": "Anel Kalajevac",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/smart-lazy-loader.es.js",
-      "require": "./dist/smart-lazy-loader.cjs.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
-  "main": "dist/smart-lazy-loader.cjs.js",
-  "module": "dist/smart-lazy-loader.es.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "README.md",
@@ -31,7 +31,7 @@
     "package.json"
   ],
   "scripts": {
-    "build": "vite build && tsc --emitDeclarationOnly",
+    "build": "tsup",
     "clean": "rm -rf dist",
     "coverage": "vitest run --coverage",
     "format": "prettier --write .",
@@ -65,8 +65,8 @@
     "lint-staged": "^15.5.1",
     "prettier": "^3.5.3",
     "semantic-release": "^24.2.3",
+    "tsup": "^8.4.0",
     "typescript": "~5.7.2",
-    "vite": "^6.2.0",
     "vitest": "^3.1.1"
   }
 }
