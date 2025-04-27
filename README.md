@@ -17,8 +17,7 @@
   - `visible` (IntersectionObserver)
   - `idle` (using `requestIdleCallback` or `setTimeout`)
   - `delay` (with customizable delay)
-  - `click` (triggered on user click)
-  - `mousemove` (triggered on user mouse movement)
+  - `element-event` (triggered by existing or custom events on any DOM element)
 - 📦 **Batch support**: Load multiple modules in parallel with a single or multiple triggers.
 - 🛠️ **Full control**: Exposes a controller with `trigger`, `cancel`, and `hasLoaded` for more flexibility.
 - 🎯 Tiny, tree-shakable, no dependencies
@@ -66,6 +65,26 @@ console.log(controller.hasLoaded); // false (initially)
 controller.cancel();
 ```
 
+### Example: Lazy loading when a custom event is triggered on an element
+
+```ts
+import { lazyLoad } from 'smart-lazy-loader';
+
+const MyComponent = () => import('./MyComponent');
+
+const target = document.getElementById('custom-event-target') as HTMLElement;
+
+const controller = lazyLoad(MyComponent, {
+  on: 'element-event', // Trigger lazy load on custom event
+  eventName: 'customEvent', // Custom event name
+  target,
+});
+
+// Dispatch the custom event
+const event = new CustomEvent('customEvent');
+target.dispatchEvent(event);
+```
+
 ### Example: Lazy loading multiple modules (batch)
 
 ```ts
@@ -77,7 +96,7 @@ const loadB = () => import('./ComponentB');
 const target = document.getElementById('batch-target') as HTMLElement;
 
 lazyLoad([loadA, loadB], {
-  on: 'click',
+  on: 'idle',
   target,
 });
 ```
@@ -93,10 +112,17 @@ const target = document.getElementById('batch-target') as HTMLElement;
 
 lazyLoad(MyComponent, [
   {
-    on: 'click',
+    on: 'element-event',
+    eventName: 'click',
     target,
+    eventOptions: { once: true },
   },
-  { on: 'mousemove', target },
+  {
+    on: 'element-event',
+    eventName: 'mousemove',
+    target,
+    eventOptions: { once: true },
+  },
 ]);
 ```
 
@@ -107,8 +133,7 @@ lazyLoad(MyComponent, [
   - `visible` - Use `IntersectionObserver` to load when the element is visible in the viewport.
   - `idle` - Load when the browser is idle (either via `requestIdleCallback` or `setTimeout` fallback).
   - `delay` - Load after a specified delay in milliseconds.
-  - `click` - Load when the user clicks on the target.
-  - `mousemove` - Load when the user moves the mouse over the target.
+  - `element-event` - Load when a custom event is triggered on a target element (e.g., `click`, `customEvent`, etc.).
 
 - `target` (Required)
 
@@ -123,7 +148,14 @@ lazyLoad(MyComponent, [
   - Used with `'visible'` event type. The margin around the root element to trigger the lazy load earlier or later. Default is '0'.
 
 - `threshold` (Optional)
+
   - The percentage of the target element that must be visible before it’s considered in view. A value between 0 and 1, with 0.5 representing 50% visibility.
+
+- `eventName` (Required for `element-event`)
+
+  - The name of the custom event to trigger lazy loading (e.g., `click`, `customEvent`, etc.).
+
+- `eventOptions` (Optional for `element-event`)
 
 ## 🤝 Contributing
 

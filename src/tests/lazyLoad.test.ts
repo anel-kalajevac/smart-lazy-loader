@@ -61,8 +61,10 @@ describe('lazyLoad', () => {
     document.body.appendChild(target);
 
     lazyLoad(importer, {
-      on: 'click',
+      on: 'element-event',
       target,
+      eventName: 'click',
+      eventOptions: { once: true },
     });
 
     target.dispatchEvent(new MouseEvent('click'));
@@ -77,11 +79,29 @@ describe('lazyLoad', () => {
     const target = document.createElement('div');
 
     lazyLoad(importer, {
-      on: 'mousemove',
+      on: 'element-event',
       target,
+      eventName: 'mousemove',
+      eventOptions: { once: true },
     });
 
     target.dispatchEvent(new MouseEvent('mousemove'));
+
+    expect(importer).toHaveBeenCalled();
+  });
+
+  it('should load module on customEvent', async () => {
+    const importer = vi.fn(() => Promise.resolve('module'));
+    const target = document.createElement('div');
+
+    lazyLoad(importer, {
+      on: 'element-event',
+      target,
+      eventName: 'customEvent',
+      eventOptions: { once: true },
+    });
+
+    target.dispatchEvent(new CustomEvent('customEvent'));
 
     expect(importer).toHaveBeenCalled();
   });
@@ -161,8 +181,10 @@ describe('lazyLoad', () => {
     const target = document.createElement('div');
 
     const controller = lazyLoad(importer, {
-      on: 'click',
+      on: 'element-event',
       target,
+      eventName: 'click',
+      eventOptions: { once: true },
     });
 
     expect(controller.hasLoaded).toBe(false);
@@ -176,8 +198,10 @@ describe('lazyLoad', () => {
     const target = document.createElement('div');
 
     const controller = lazyLoad([importerA, importerB], {
-      on: 'click',
+      on: 'element-event',
       target,
+      eventName: 'click',
+      eventOptions: { once: true },
     });
 
     const event = new MouseEvent('click');
@@ -212,8 +236,10 @@ describe('lazyLoad', () => {
     const target = document.createElement('div');
 
     const controller = lazyLoad([importerA, importerB], {
-      on: 'click',
+      on: 'element-event',
       target,
+      eventName: 'click',
+      eventOptions: { once: true },
     });
 
     await controller.trigger();
