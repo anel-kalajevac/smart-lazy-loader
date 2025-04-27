@@ -1,6 +1,6 @@
 {
   "name": "smart-lazy-loader",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Framework-agnostic smart lazy loading for images, components, and scripts.",
   "keywords": [
     "framework-agnostic",
