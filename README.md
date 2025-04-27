@@ -2,14 +2,13 @@
 
 > A simple and flexible lazy load utility that works in various event-driven scenarios, such as visibility, idle, click, and mousemove. Optimized for performance and can be easily integrated into any JavaScript or TypeScript project.
 
-![npm version](https://img.shields.io/npm/v/smart-lazy-loader)
-![license](https://img.shields.io/github/license/anel-kalajevac/smart-lazy-loader)
+[![npm version](https://img.shields.io/npm/v/smart-lazy-loader)](https://www.npmjs.com/package/smart-lazy-loader)
+[![license](https://img.shields.io/github/license/anel-kalajevac/smart-lazy-loader)](https://github.com/anel-kalajevac/smart-lazy-loader?tab=MIT-1-ov-file#readme)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/smart-lazy-loader)
 ![types](https://img.shields.io/npm/types/smart-lazy-loader)
 ![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
-![code style](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)
 ![semantic release](https://img.shields.io/badge/release-semantic--release-blue)
-![stars](https://img.shields.io/github/stars/anel-kalajevac/smart-lazy-loader?style=social)
+[![stars](https://img.shields.io/github/stars/anel-kalajevac/smart-lazy-loader?style=social)](https://github.com/anel-kalajevac/smart-lazy-loader)
 
 ## ✨ Features
 
@@ -20,7 +19,7 @@
   - `delay` (with customizable delay)
   - `click` (triggered on user click)
   - `mousemove` (triggered on user mouse movement)
-- 📦 **Batch support**: Load multiple modules in parallel with a single trigger.
+- 📦 **Batch support**: Load multiple modules in parallel with a single or multiple triggers.
 - 🛠️ **Full control**: Exposes a controller with `trigger`, `cancel`, and `hasLoaded` for more flexibility.
 - 🎯 Tiny, tree-shakable, no dependencies
 - 💡 Written in TypeScript with full type support
@@ -53,8 +52,8 @@ const target = document.getElementById('component-target') as HTMLElement;
 const controller = lazyLoad(MyComponent, {
   on: 'visible',
   target,
-  rootMargin: '100px', // trigger 100px before component is visible
-  threshold: 0.5, // trigger when 50% of the component is visible
+  rootMargin: '100px',
+  threshold: 0.5,
 });
 
 // Trigger manually
@@ -67,62 +66,7 @@ console.log(controller.hasLoaded); // false (initially)
 controller.cancel();
 ```
 
-### Example: Lazy loading after a delay
-
-```ts
-import { lazyLoad } from 'smart-lazy-loader';
-
-const MyComponent = () => import('./MyComponent');
-const target = document.getElementById('component-target') as HTMLElement;
-
-lazyLoad(MyComponent, {
-  on: 'delay',
-  delay: 1000, // wait 1 second before loading
-});
-```
-
-### Example: Lazy loading when the user clicks
-
-```ts
-import { lazyLoad } from 'smart-lazy-loader';
-
-const MyComponent = () => import('./MyComponent');
-const target = document.getElementById('component-target') as HTMLElement;
-
-lazyLoad(MyComponent, {
-  on: 'click',
-  target,
-});
-```
-
-### Example: Lazy loading on mouse move
-
-```ts
-import { lazyLoad } from 'smart-lazy-loader';
-
-const MyComponent = () => import('./MyComponent');
-const target = document.getElementById('component-target') as HTMLElement;
-
-lazyLoad(MyComponent, {
-  on: 'mousemove',
-  target,
-});
-```
-
-### Example: Lazy loading when the page is idle
-
-```ts
-import { lazyLoad } from 'smart-lazy-loader';
-
-const MyComponent = () => import('./MyComponent');
-const target = document.getElementById('component-target') as HTMLElement;
-
-lazyLoad(MyComponent, {
-  on: 'idle',
-});
-```
-
-### Example: Load multiple modules (batch)
+### Example: Lazy loading multiple modules (batch)
 
 ```ts
 import { lazyLoad } from 'smart-lazy-loader';
@@ -136,6 +80,24 @@ lazyLoad([loadA, loadB], {
   on: 'click',
   target,
 });
+```
+
+### Example: Lazy loading with multiple triggers
+
+```ts
+import { lazyLoad } from 'smart-lazy-loader';
+
+const MyComponent = () => import('./MyComponent');
+
+const target = document.getElementById('batch-target') as HTMLElement;
+
+lazyLoad(MyComponent, [
+  {
+    on: 'click',
+    target,
+  },
+  { on: 'mousemove', target },
+]);
 ```
 
 ## 🛠 Configuration Options
