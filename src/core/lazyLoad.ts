@@ -16,17 +16,33 @@ export function lazyLoad<T>(
 ): LazyLoadController<T[]>;
 
 export function lazyLoad<T>(
+  importer: LazyImporter<T>,
+  options: LazyLoadOptions[]
+): LazyLoadController<T>;
+
+export function lazyLoad<T>(
+  importer: LazyImporter<T>[],
+  options: LazyLoadOptions[]
+): LazyLoadController<T[]>;
+
+export function lazyLoad<T>(
   importer: LazyImporter<T> | LazyImporter<T>[],
-  options: LazyLoadOptions
+  options: LazyLoadOptions | LazyLoadOptions[]
 ): LazyLoadController<T | T[]> {
   let hasLoaded = false;
   let result: Promise<T | T[]> | null = null;
-  let cleanup: (() => void) | undefined;
+  let cleanups: (() => void)[] = [];
+  const allOptions = Array.isArray(options) ? options : [options];
+
+  const clean = () => {
+    cleanups.forEach((c) => c());
+    cleanups = [];
+  };
 
   const load = () => {
     if (hasLoaded && result) return result;
     hasLoaded = true;
-    cleanup?.();
+    clean();
     if (Array.isArray(importer)) {
       result = Promise.all(importer.map((fn) => fn()));
     } else {
@@ -35,36 +51,38 @@ export function lazyLoad<T>(
     return result;
   };
 
-  switch (options.on) {
-    case 'idle':
-      cleanup = createIdleTrigger(load);
-      break;
+  for (const option of allOptions) {
+    switch (option.on) {
+      case 'idle':
+        cleanups.push(createIdleTrigger(load));
+        break;
 
-    case 'delay':
-      cleanup = createDelayTrigger(options.delay, load);
-      break;
+      case 'delay':
+        cleanups.push(createDelayTrigger(option.delay, load));
+        break;
 
-    case 'click':
-      cleanup = createClickTrigger(options.target, load);
-      break;
+      case 'click':
+        cleanups.push(createClickTrigger(option.target, load));
+        break;
 
-    case 'mousemove': {
-      cleanup = createMousemoveTrigger(options.target, load);
-      break;
+      case 'mousemove':
+        cleanups.push(createMousemoveTrigger(option.target, load));
+        break;
+
+      case 'visible':
+        cleanups.push(
+          createVisibleTrigger(option.target, load, option.rootMargin, option.threshold)
+        );
+        break;
+
+      default:
+        throw new Error('Unsupported event type!');
     }
-
-    case 'visible': {
-      cleanup = createVisibleTrigger(options.target, load, options.rootMargin, options.threshold);
-      break;
-    }
-
-    default:
-      throw new Error('Unsupported event type!');
   }
 
   return {
     trigger: () => Promise.resolve(load()),
-    cancel: () => cleanup?.(),
+    cancel: () => clean(),
     get hasLoaded() {
       return hasLoaded;
     },
