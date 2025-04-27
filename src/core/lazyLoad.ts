@@ -1,7 +1,6 @@
-import { createClickTrigger } from './triggers/click';
 import { createDelayTrigger } from './triggers/delay';
+import { createElementEventTrigger } from './triggers/elementEvent';
 import { createIdleTrigger } from './triggers/idle';
-import { createMousemoveTrigger } from './triggers/mousemove';
 import { createVisibleTrigger } from './triggers/visible';
 import { LazyImporter, LazyLoadController, LazyLoadOptions } from './types';
 
@@ -61,17 +60,15 @@ export function lazyLoad<T>(
         cleanups.push(createDelayTrigger(option.delay, load));
         break;
 
-      case 'click':
-        cleanups.push(createClickTrigger(option.target, load));
-        break;
-
-      case 'mousemove':
-        cleanups.push(createMousemoveTrigger(option.target, load));
-        break;
-
       case 'visible':
         cleanups.push(
           createVisibleTrigger(option.target, load, option.rootMargin, option.threshold)
+        );
+        break;
+
+      case 'element-event':
+        cleanups.push(
+          createElementEventTrigger(option.target, load, option.eventName, option.eventOptions)
         );
         break;
 

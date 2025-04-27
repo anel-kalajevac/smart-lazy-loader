@@ -10,24 +10,16 @@ type DelayOptions = {
   delay: number;
 };
 
-type ClickOptions = {
-  on: 'click';
-  target: HTMLElement;
-};
-
-type MousemoveOptions = {
-  on: 'mousemove';
-  target: HTMLElement;
-};
-
 type IdleOptions = { on: 'idle' };
 
-export type LazyLoadOptions =
-  | VisibleOptions
-  | DelayOptions
-  | ClickOptions
-  | MousemoveOptions
-  | IdleOptions;
+type ElementEventOptions = {
+  on: 'element-event';
+  target: HTMLElement;
+  eventName: keyof HTMLElementEventMap | string;
+  eventOptions?: AddEventListenerOptions;
+};
+
+export type LazyLoadOptions = VisibleOptions | DelayOptions | IdleOptions | ElementEventOptions;
 
 export type LazyLoadController<T> = {
   trigger: () => Promise<T>;
