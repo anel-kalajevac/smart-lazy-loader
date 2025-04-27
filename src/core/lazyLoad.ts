@@ -54,7 +54,7 @@ export function lazyLoad<T>(
     }
 
     case 'visible': {
-      cleanup = createVisibleTrigger(options.target, load);
+      cleanup = createVisibleTrigger(options.target, load, options.rootMargin, options.threshold);
       break;
     }
 
